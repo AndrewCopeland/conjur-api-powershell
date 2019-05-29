@@ -60,6 +60,19 @@ created_roles                                                                   
 @{dev:host:database/another-host=}                                                                                    4
 ```
 
+#### Get-ConjurResources
+
+```powershell
+PS C:\> Get-ConjurResources
+
+created_at      : 2019-05-29T16:42:56.284+00:00
+id              : dev:policy:root
+owner           : dev:user:admin
+permissions     : {}
+annotations     : {}
+policy_versions : {@{version=1; created_at=2019-05-29T16:42:56.284+00:00; policy_text=---       
+```
+
 #### Get-Help
 You can Get-Help on all of the functions mentioned above.
 
