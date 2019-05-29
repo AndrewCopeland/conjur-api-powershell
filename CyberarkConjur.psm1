@@ -172,6 +172,43 @@ Function Get-SessionTokenHeader
     return $header
 }
 
+Function Get-ConjurApiKey
+{
+    param(
+        $ConjurAccount = $env:CONJUR_ACCOUNT,
+        $ConjurUsername = $env:CONJUR_AUTHN_LOGIN,
+        $ConjurPassword = $env:CONJUR_AUTHN_API_KEY,
+        $ConjurApplianceUrl = $env:CONJUR_APPLIANCE_URL,
+        $IgnoreSsl = $false
+    )
+
+    if (!(Test-MandatoryParameters)) { return }
+    if (($IgnoreSsl)) { Disable-SslVerification }
+
+    $url = "$ConjurApplianceUrl/authn/$ConjurAccount/login"
+    $base64 = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $ConjurUsername, $ConjurPassword)))
+    $basicAuthHeader = @{"Authorization"="Basic $base64"}
+
+    return Send-HttpMethod -Url $url -Method GET -Header $basicAuthHeader
+}
+
+Function Get-ConjurSessionToken
+{
+    param(
+        $ConjurAccount = $env:CONJUR_ACCOUNT,
+        $ConjurUsername = $env:CONJUR_AUTHN_LOGIN,
+        $ConjurPassword = $env:CONJUR_AUTHN_API_KEY,
+        $ConjurApplianceUrl = $env:CONJUR_APPLIANCE_URL,
+        $IgnoreSsl = $false
+    )
+
+    $apiKey = Get-ConjurApiKey -ConjurAccount $ConjurAccount -ConjurUsername $ConjurUsername -ConjurPassword $ConjurPassword -ConjurApplianceUrl $ConjurApplianceUrl -IgnoreSsl $IgnoreSsl
+
+    $url = "$ConjurApplianceUrl/authn/$ConjurAccount/$ConjurUsername/authenticate"
+
+    return Send-HttpMethod -Url $url -Method POST -Body $apiKey
+}
+
 <#
 .SYNOPSIS
 
@@ -219,43 +256,6 @@ Function Get-ConjurHealth
 
     $url = "$ConjurApplianceUrl/health"
     return Send-HttpMethod -Url $url -Method "GET"
-}
-
-Function Get-ConjurApiKey
-{
-    param(
-        $ConjurAccount = $env:CONJUR_ACCOUNT,
-        $ConjurUsername = $env:CONJUR_AUTHN_LOGIN,
-        $ConjurPassword = $env:CONJUR_AUTHN_API_KEY,
-        $ConjurApplianceUrl = $env:CONJUR_APPLIANCE_URL,
-        $IgnoreSsl = $false
-    )
-
-    if (!(Test-MandatoryParameters)) { return }
-    if (($IgnoreSsl)) { Disable-SslVerification }
-
-    $url = "$ConjurApplianceUrl/authn/$ConjurAccount/login"
-    $base64 = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $ConjurUsername, $ConjurPassword)))
-    $basicAuthHeader = @{"Authorization"="Basic $base64"}
-
-    return Send-HttpMethod -Url $url -Method GET -Header $basicAuthHeader
-}
-
-Function Get-ConjurSessionToken
-{
-    param(
-        $ConjurAccount = $env:CONJUR_ACCOUNT,
-        $ConjurUsername = $env:CONJUR_AUTHN_LOGIN,
-        $ConjurPassword = $env:CONJUR_AUTHN_API_KEY,
-        $ConjurApplianceUrl = $env:CONJUR_APPLIANCE_URL,
-        $IgnoreSsl = $false
-    )
-
-    $apiKey = Get-ConjurApiKey -ConjurAccount $ConjurAccount -ConjurUsername $ConjurUsername -ConjurPassword $ConjurPassword -ConjurApplianceUrl $ConjurApplianceUrl -IgnoreSsl $IgnoreSsl
-
-    $url = "$ConjurApplianceUrl/authn/$ConjurAccount/$ConjurUsername/authenticate"
-
-    return Send-HttpMethod -Url $url -Method POST -Body $apiKey
 }
 
 <#
@@ -308,7 +308,7 @@ Function Get-ConjurSecret()
     $header = Get-SessionTokenHeader -SessionToken $sessionToken
     $url = "$ConjurApplianceUrl/secrets/$ConjurAccount/$SecretKind/$SecretIdentifier"
 
-    Send-HttpMethod -Url $url -Method GET -Header $header
+    return Send-HttpMethod -Url $url -Method GET -Header $header
 }
 
 <#
@@ -366,7 +366,7 @@ Function Set-ConjurSecret
     $header = Get-SessionTokenHeader -SessionToken $sessionToken
     $url = "$ConjurApplianceUrl/secrets/$ConjurAccount/$SecretKind/$SecretIdentifier"
 
-    Send-HttpMethod -Url $url -Method POST -Header $header -Body $SecretValue
+    return Send-HttpMethod -Url $url -Method POST -Header $header -Body $SecretValue
 }
 
 <#
@@ -427,12 +427,65 @@ Function Update-ConjurPolicy
     $header = Get-SessionTokenHeader -SessionToken $sessionToken
     $url = "$ConjurApplianceUrl/policies/$ConjurAccount/policy/$PolicyIdentifier"
     $policyContent = Get-Content -Path $PolicyFilePath -Raw
-    Write-Log "Policy Content: $policyContent"
 
     return Send-HttpMethod -Url $url -Header $header -Method PATCH -Body $policyContent
+}
+
+<#
+.SYNOPSIS
+
+List resource within an organization account
+
+.DESCRIPTION
+
+List resource within an organization account
+
+.INPUTS
+
+None. You cannot pipe objects to Get-ConjurResources.
+
+.OUTPUTS
+
+System.Collections.Hashtable. All the resources the user has access to
+
+.EXAMPLE
+
+PS> Get-ConjurResources
+
+created_at      : 2019-05-29T16:42:56.284+00:00
+id              : dev:policy:root
+owner           : dev:user:admin
+permissions     : {}
+annotations     : {}
+policy_versions : {@{version=1; created_at=2019-05-29T16:42:56.284+00:00; policy_text=---                                                                               4
+
+
+.LINK
+
+https://www.conjur.org/api.html#role-based-access-control-list-resources-get
+
+
+#>
+Function Get-ConjurResources
+{
+    param(
+        $ConjurAccount = $env:CONJUR_ACCOUNT,
+        $ConjurUsername = $env:CONJUR_AUTHN_LOGIN,
+        $ConjurPassword = $env:CONJUR_AUTHN_API_KEY,
+        $ConjurApplianceUrl = $env:CONJUR_APPLIANCE_URL,
+        [Switch]
+        $IgnoreSsl
+    )
+
+    $sessionToken = Get-ConjurSessionToken -ConjurAccount $ConjurAccount -ConjurUsername $ConjurUsername -ConjurPassword $ConjurPassword -ConjurApplianceUrl $ConjurApplianceUrl -IgnoreSsl $IgnoreSsl
+    $header = Get-SessionTokenHeader -SessionToken $sessionToken
+    $url = "$ConjurApplianceUrl/resources/$ConjurAccount"
+
+    return Send-HttpMethod -Url $url -Header $header -Method GET
 }
 
 Export-ModuleMember -Function Get-ConjurHealth
 Export-ModuleMember -Function Get-ConjurSecret
 Export-ModuleMember -Function Set-ConjurSecret
 Export-ModuleMember -Function Update-ConjurPolicy
+Export-ModuleMember -Function Get-ConjurResources
