@@ -63,7 +63,7 @@ created_roles                                                                   
 ```
 
 #### Get-Help
-You can Get-Help on all of the functioned mentioned above.
+You can Get-Help on all of the functions mentioned above.
 
 ```powershell
 PS C:\> Get-Help Update-ConjurPolicy
