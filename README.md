@@ -52,8 +52,6 @@ services                                database                                
 
 #### Update-ConjurPolicy
 
-Write the code same as in the first example but create the client with the following arguments:
-
 ```powershell
 PS C:\> Update-ConjurPolicy -PolicyIdentifier "root" -PolicyFilePath ".\test-policy.yml"
 
