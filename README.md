@@ -23,7 +23,7 @@ PS C:\> Import-Module .\CyberarkConjur.psm1
 ```powershell
 PS C:\> $env:CONJUR_ACCOUNT="dev"
 PS C:\> $env:CONJUR_AUTHN_LOGIN="admin"
-PS C:\> $env:CONJUR_AUTHN_API_KEY="adminPasswoprd"
+PS C:\> $env:CONJUR_AUTHN_API_KEY="adminPassword"
 PS C:\> $env:CONJUR_APPLIANCE_URL="https://conjur.yourorg.com:443"
 ```
 
