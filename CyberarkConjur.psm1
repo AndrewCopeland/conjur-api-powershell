@@ -120,8 +120,9 @@ Function Send-HttpMethod()
     {
         $exception = $_.Exception
         $responseBody = Get-ResponseBodyFromException($exception)
-        Write-Log -Message "Response Body: $responseBody`n$exception" -Level "ERROR"
-        return 1;
+        Write-Log -Message "Response Body: `n $($responseBody | ConvertFrom-Json | ConvertTo-Json)" -Level "ERROR"
+        throw $_
+        break
     }
     
     if ($LogResponse)
@@ -192,6 +193,24 @@ Function Get-ConjurApiKey
     return Send-HttpMethod -Url $url -Method GET -Header $basicAuthHeader
 }
 
+# This is required because powershell will automatically decode %2F to / to avoid that we must run this method on the uri that contains %2F
+function FixUri($uri){
+    $UnEscapeDotsAndSlashes = 0x2000000;
+    $SimpleUserSyntax = 0x20000;
+
+    $type = $uri.GetType();
+    $fieldInfo = $type.GetField("m_Syntax", ([System.Reflection.BindingFlags]::Instance -bor [System.Reflection.BindingFlags]::NonPublic));
+
+    $uriParser = $fieldInfo.GetValue($uri);
+    $typeUriParser = $uriParser.GetType().BaseType;
+    $fieldInfo = $typeUriParser.GetField("m_Flags", ([System.Reflection.BindingFlags]::Instance -bor [System.Reflection.BindingFlags]::NonPublic -bor [System.Reflection.BindingFlags]::FlattenHierarchy));
+    $uriSyntaxFlags = $fieldInfo.GetValue($uriParser);
+
+    $uriSyntaxFlags = $uriSyntaxFlags -band (-bnot $UnEscapeDotsAndSlashes);
+    $uriSyntaxFlags = $uriSyntaxFlags -band (-bnot $SimpleUserSyntax);
+    $fieldInfo.SetValue($uriParser, $uriSyntaxFlags);
+}
+
 Function Get-ConjurSessionToken
 {
     param(
@@ -204,7 +223,10 @@ Function Get-ConjurSessionToken
 
     $apiKey = Get-ConjurApiKey -ConjurAccount $ConjurAccount -ConjurUsername $ConjurUsername -ConjurPassword $ConjurPassword -ConjurApplianceUrl $ConjurApplianceUrl -IgnoreSsl $IgnoreSsl
 
-    $url = "$ConjurApplianceUrl/authn/$ConjurAccount/$ConjurUsername/authenticate"
+    $ConjurUsername = [uri]::EscapeDataString($ConjurUsername)
+
+    $url = ([uri]"$ConjurApplianceUrl/authn/$ConjurAccount/$ConjurUsername/authenticate")
+    fixuri $url
 
     return Send-HttpMethod -Url $url -Method POST -Body $apiKey
 }
@@ -306,7 +328,9 @@ Function Get-ConjurSecret()
 
     $sessionToken = Get-ConjurSessionToken -ConjurAccount $ConjurAccount -ConjurUsername $ConjurUsername -ConjurPassword $ConjurPassword -ConjurApplianceUrl $ConjurApplianceUrl -IgnoreSsl $IgnoreSsl
     $header = Get-SessionTokenHeader -SessionToken $sessionToken
+    # $SecretIdentifier = [uri]::EscapeDataString($SecretIdentifier)
     $url = "$ConjurApplianceUrl/secrets/$ConjurAccount/$SecretKind/$SecretIdentifier"
+    # FixUri $url
 
     return Send-HttpMethod -Url $url -Method GET -Header $header
 }
