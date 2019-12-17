@@ -10,6 +10,14 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- task: conjur-secret@0
+  inputs:
+    SecretIdentifier: 'my/secret/goes/here'
+    ConjurAccount: 'conjur'
+    ConjurApplianceUrl: 'https://conjur-master'
+    ConjurUsername: 'host/madeup'
+    ConjurPassword: '37828737823hd728h28dh2d'
+
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
 
