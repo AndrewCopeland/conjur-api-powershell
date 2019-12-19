@@ -10,14 +10,14 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- task: conjur-secret@0
+- task: GetConjurSecret@0
   inputs:
-    SecretIdentifier: 'my/secret/goes/here'
-    ConjurAccount: 'conjur'
-    ConjurApplianceUrl: '$(conjur-appliance-url)'
-    ConjurUsername: '$(conjur-username)'
-    ConjurPassword: '$(conjur-password)'
-
+    conjurapplianceurl: '$(conjur-appliance-url)'
+    conjuraccount: 'conjur'
+    conjurusername: '$(conjur-username)'
+    conjurapikey: '$(conjur-password)'
+    ignoreSsl: true
+  
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
 
