@@ -10,7 +10,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- task: GetConjurSecret@0
+- task: GetConjurSecret@1
   inputs:
     conjurapplianceurl: '$(conjur-appliance-url)'
     conjuraccount: 'conjur'
