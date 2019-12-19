@@ -15,7 +15,7 @@ steps:
     conjurapplianceurl: '$(conjur-appliance-url)'
     conjuraccount: 'conjur'
     conjurusername: '$(conjur-username)'
-    conjurapikey: '$(conjur-password)'
+    conjurapikey: '$(conjur-password-new)'
     ignoreSsl: true
   
 - script: echo Hello, world!
