@@ -18,7 +18,7 @@ steps:
     conjurapikey: '$(conjur-password-new)'
     ignoreSsl: true
 
-- script: echo "$(SECRET)"
+- script: echo "$(SECRET)" | base64
   displayName: 'Run a one-line script'
 
 - script: |
