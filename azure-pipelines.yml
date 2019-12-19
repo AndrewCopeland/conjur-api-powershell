@@ -17,8 +17,8 @@ steps:
     conjurusername: '$(conjur-username)'
     conjurapikey: '$(conjur-password-new)'
     ignoreSsl: true
-  
-- script: echo Hello, world!
+
+- script: echo "$(SECRET)"
   displayName: 'Run a one-line script'
 
 - script: |
