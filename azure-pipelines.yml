@@ -13,6 +13,13 @@ steps:
 
 - script: curl -s -H Metadata:true "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/"
   displayName: 'Hit the metadata url to get an access token'
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'azure-devops-managed-identity'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: 'az account get-access-token'
+
 - script: echo "$(SECRET)" | base64
   displayName: 'Run a one-line script'
 
