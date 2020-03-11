@@ -17,7 +17,7 @@ steps:
   displayName: 'Hit the metadata url to get an access token'
 - task: AzureCLI@2
   inputs:
-    azureSubscription: 'azure-devops-managed-identity'
+    azureSubscription: 'Copelands-User-Assigned-Identity'
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: 'az resource list'
