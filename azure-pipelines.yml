@@ -10,13 +10,6 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- task: GetConjurSecret@1
-  inputs:
-    conjurapplianceurl: '$(conjur-appliance-url)'
-    conjuraccount: 'conjur'
-    conjurusername: '$(conjur-username)'
-    conjurapikey: '$(conjur-password-new)'
-    ignoreSsl: true
 
 - script: echo "$(SECRET)" | base64
   displayName: 'Run a one-line script'
