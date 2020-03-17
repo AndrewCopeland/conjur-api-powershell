@@ -12,14 +12,8 @@ steps:
 # - script: az login --identity
 #   displayName: 'login?'
   
-- script: curl -s -H Metadata:true "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/"
+- script: curl -s -H Metadata:true "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&client_id=ca062498-e45d-4b95-9340-d15b1d65d1f2&resource=https://management.azure.com/"
   displayName: 'Hit the metadata url to get an access token'
-- task: AzureCLI@2
-  inputs:
-    azureSubscription: 'Copelands-User-Assigned-Identity'
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: 'az resource list'
 
 - script: echo "$(SECRET)" | base64
   displayName: 'Run a one-line script'
