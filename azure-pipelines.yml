@@ -6,8 +6,7 @@
 trigger:
 - master
 
-pool:
-  vmImage: 'ubuntu-latest'
+pool: NewPool
 
 steps:
 # - script: az login --identity
