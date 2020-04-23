@@ -21,29 +21,29 @@ PS C:\> Import-Module .\CyberarkConjur.psm1
 
 #### Setting environment variables
 ```powershell
-PS C:\> $env:CONJUR_ACCOUNT="dev"
-PS C:\> $env:CONJUR_AUTHN_LOGIN="admin"
-PS C:\> $env:CONJUR_AUTHN_API_KEY="adminPassword"
-PS C:\> $env:CONJUR_APPLIANCE_URL="https://conjur.yourorg.com:443"
+$env:CONJUR_ACCOUNT="dev"
+$env:CONJUR_AUTHN_LOGIN="admin"
+$env:CONJUR_AUTHN_API_KEY="adminPassword"
+$env:CONJUR_APPLIANCE_URL="https://conjur.yourorg.com:443"
 ```
 
 #### Get-ConjurSecret
 
 ```powershell
-PS C:\> Get-ConjurSecret -SecretIdentifier "secrets/db-password"
+Get-ConjurSecret -SecretIdentifier "secrets/db-password"
 secretPasswordHere
 ```
 
 #### Set-ConjurSecret
 
 ```powershell
-PS C:\> Set-ConjurSecret -SecretIdentifier "secrets/db-password" -SecretValue "brandNewSecret"
+Set-ConjurSecret -SecretIdentifier "secrets/db-password" -SecretValue "brandNewSecret"
 ```
 
 #### Get-ConjurHealth
 
 ```powershell
-PS C:\> Get-ConjurHealth
+Get-ConjurHealth
 
 services                                database                                                                     ok
 --------                                --------                                                                     --
@@ -53,7 +53,7 @@ services                                database                                
 #### Update-ConjurPolicy
 
 ```powershell
-PS C:\> Update-ConjurPolicy -PolicyIdentifier "root" -PolicyFilePath ".\test-policy.yml"
+Update-ConjurPolicy -PolicyIdentifier "root" -PolicyFilePath ".\test-policy.yml"
 
 created_roles                                                                                                   version
 -------------                                                                                                   -------
@@ -63,7 +63,7 @@ created_roles                                                                   
 #### Get-ConjurResources
 
 ```powershell
-PS C:\> Get-ConjurResources
+Get-ConjurResources
 
 created_at      : 2019-05-29T16:42:56.284+00:00
 id              : dev:policy:root
@@ -77,7 +77,7 @@ policy_versions : {@{version=1; created_at=2019-05-29T16:42:56.284+00:00; policy
 You can Get-Help on all of the functions mentioned above.
 
 ```powershell
-PS C:\> Get-Help Update-ConjurPolicy
+Get-Help Update-ConjurPolicy
 
 NAME
     Update-ConjurPolicy
