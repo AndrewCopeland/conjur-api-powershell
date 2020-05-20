@@ -798,6 +798,66 @@ Function Get-ConjurResources
     return Send-HttpMethod -Url $url -Header $header -Method GET
 }
 
+<#
+.SYNOPSIS
+
+Rotate an identities API Key
+
+.DESCRIPTION
+
+Rotate an identities API Key
+
+.PARAMETER RoleKind
+
+The kind of identity being rotated. e.g. 'host' or 'user'
+
+.PARAMETER RoleId
+
+The ID of the identity being rotated. e.g. 'this/is/an/app' or 'example_user@example.com'
+
+.INPUTS
+
+None. You cannot pipe objects to Get-ConjurResources.
+
+.OUTPUTS
+
+The new api key of the identity
+
+.EXAMPLE
+
+PS> New-ConjurApiKey
+ujibfbz84bfkzbf93bskscv093bskxks903bekdid9ejdjjd
+
+.LINK
+
+https://docs.conjur.org/Latest/en/Content/Developer/Conjur_API_Rotate_Other_API_Key.htm?tocpath=Developer%7CREST%C2%A0APIs%7C_____5
+
+
+#>
+Function New-ConjurApiKey
+{
+    param(
+        [Parameter(Position=0,mandatory=$true)]
+        [string]$RoleKind,
+        [Parameter(Position=1,mandatory=$true)]
+        [string]$RoleId,
+        $ConjurAccount = $env:CONJUR_ACCOUNT,
+        $ConjurUsername = $env:CONJUR_AUTHN_LOGIN,
+        $ConjurPassword = $env:CONJUR_AUTHN_API_KEY,
+        $ConjurApplianceUrl = $env:CONJUR_APPLIANCE_URL,
+        $IamAuthnBranch = $env:CONJUR_IAM_AUTHN_BRANCH,
+        [Switch]
+        $IgnoreSsl
+    )
+
+    $sessionToken = Get-ConjurSessionToken -ConjurAccount $ConjurAccount -ConjurUsername $ConjurUsername -ConjurPassword $ConjurPassword -ConjurApplianceUrl $ConjurApplianceUrl -IamAuthnBranch $IamAuthnBranch -IgnoreSsl $IgnoreSsl
+    $header = Get-SessionTokenHeader -SessionToken $sessionToken
+    $url = "$ConjurApplianceUrl/resources/$ConjurAccount"
+    $RoleId = [uri]::EscapeDataString($RoleId)
+    $url = "$ConjurApplianceUrl/authn/$ConjurAccount/api_key?role=${RoleKind}:$RoleId"
+
+    return Send-HttpMethod -Url $url -Header $header -Method PUT
+}
 
 Export-ModuleMember -Function Get-ConjurHealth
 Export-ModuleMember -Function Get-ConjurSecret
@@ -806,3 +866,4 @@ Export-ModuleMember -Function Update-ConjurPolicy
 Export-ModuleMember -Function Replace-ConjurPolicy
 Export-ModuleMember -Function Append-ConjurPolicy
 Export-ModuleMember -Function Get-ConjurResources
+Export-ModuleMember -Function New-ConjurApiKey
