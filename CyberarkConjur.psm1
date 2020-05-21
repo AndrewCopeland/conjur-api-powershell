@@ -852,7 +852,6 @@ Function New-ConjurApiKey
 
     $sessionToken = Get-ConjurSessionToken -ConjurAccount $ConjurAccount -ConjurUsername $ConjurUsername -ConjurPassword $ConjurPassword -ConjurApplianceUrl $ConjurApplianceUrl -IamAuthnBranch $IamAuthnBranch -IgnoreSsl $IgnoreSsl
     $header = Get-SessionTokenHeader -SessionToken $sessionToken
-    $url = "$ConjurApplianceUrl/resources/$ConjurAccount"
     $RoleId = [uri]::EscapeDataString($RoleId)
     $url = "$ConjurApplianceUrl/authn/$ConjurAccount/api_key?role=${RoleKind}:$RoleId"
 
