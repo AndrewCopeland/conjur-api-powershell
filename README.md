@@ -73,6 +73,13 @@ annotations     : {}
 policy_versions : {@{version=1; created_at=2019-05-29T16:42:56.284+00:00; policy_text=---       
 ```
 
+### New-ConjurApiKey
+```powershell
+New-ConjurApiKey -RoleKind host -RoleId testing/app1
+
+kdkjhd83hh399fhjjd93939hfjfkdkdshjfhe834hnf83
+```
+
 #### Get-Help
 You can Get-Help on all of the functions mentioned above.
 
